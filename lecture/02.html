@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="02_files/libs/quarto-html/tabby.min.js"></script>
+<script src="02_files/libs/quarto-html/popper.min.js"></script>
+<script src="02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="02_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.2.269">
+
+  <meta name="author" content="Ігор Мірошниченко">
+  <title>03 - Лінійна регресія</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="02_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="02_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="02_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="02_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="02_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="02_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="02_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-captioned.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-captioned) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-captioned.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-captioned .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-captioned .callout-caption  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-captioned.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-captioned.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-caption {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-caption {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-caption {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-captioned .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-captioned .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-captioned) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-caption {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-caption {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-caption {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-caption {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-caption {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">03 - Лінійна регресія</h1>
+  <p class="subtitle">Економетрика</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Ігор Мірошниченко 
+</div>
+        <p class="quarto-title-affiliation">
+            КНЕУ::ІІТЕ
+          </p>
+    </div>
+</div>
+
+  <p class="date">2/27/23</p>
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">ЗМІСТ</h2>
+<ul>
+<li><a href="#/основні-положення" id="/toc-основні-положення">Основні положення</a></li>
+<li><a href="#/мнк-припущення-та-властивості" id="/toc-мнк-припущення-та-властивості">МНК: припущення та властивості</a></li>
+<li><a href="#/невизначеність-і-вивід" id="/toc-невизначеність-і-вивід">Невизначеність і вивід</a></li>
+<li><a href="#/довірчі-інтервали" id="/toc-довірчі-інтервали">Довірчі інтервали</a></li>
+<li><a href="#/тестування-гіпотез" id="/toc-тестування-гіпотез">Тестування гіпотез</a></li>
+</ul>
+</nav>
+</section>
+<section>
+<section id="основні-положення" class="title-slide slide level1 center">
+<h1>Основні положення</h1>
+
+</section>
+<section id="генеральна-скупупність-і-вибірка" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<h3 id="моделі-та-позначення">Моделі та позначення</h3>
+<p>Ми пишемо нашу (просту) модель генеральної сукупності</p>
+<p><span class="math display">\[ y_i = \beta_0 + \beta_1 x_i + u_i \]</span></p>
+<p>тоді наша модель регресії на основі вибірки</p>
+<p><span class="math display">\[ y_i = \hat{\beta}_0 + \hat{\beta}_1 x_i + e_i \]</span></p>
+<p>Розрахункова регресійна модель дає оцінки для кожного спостереження:</p>
+<p><span class="math display">\[ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i \]</span></p>
+<p>що дає нам <em>найкращу</em> лінію в нашому наборі даних.</p>
+</section>
+<section id="генеральна-скупупність-і-вибірка-1" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="fragment">
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/pop1-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Генеральна сукупність</strong></p>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/scatter1-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Зв’язок у генеральній сукупності</strong> <span class="math display">\[ y_i = 2.53 + 0.57 x_i + u_i \]</span> <span class="math display">\[ y_i = \beta_0 + \beta_1 x_i + u_i \]</span></p>
+</div>
+</div>
+</div>
+</section>
+<section id="генеральна-скупупність-і-вибірка-2" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample1-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Вибірка 1:</strong> 30 значень</p>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample1-scatter-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Зв’язок у генеральній сукупності</strong> <span class="math inline">\(y_i = 2.53 + 0.57 x_i + u_i\)</span></p>
+<p><strong>Зв’язок у вибірці</strong> <span class="math inline">\(\hat{y}_i = 2.36 + 0.61 x_i\)</span></p>
+</div>
+</div>
+</section>
+<section id="генеральна-скупупність-і-вибірка-3" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample2-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Вибірка 2:</strong> 30 значень</p>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample1-scatter-2-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Зв’язок у генеральній сукупності</strong> <span class="math inline">\(y_i = 2.53 + 0.57 x_i + u_i\)</span></p>
+<p><strong>Зв’язок у вибірці</strong> <span class="math inline">\(\hat{y}_i = 2.79 + 0.56 x_i\)</span></p>
+</div>
+</div>
+</section>
+<section id="генеральна-скупупність-і-вибірка-4" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="columns">
+<div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample3-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Вибірка 3:</strong> 30 значень</p>
+</div><div class="column">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/sample1-scatter-3-1.png" width="1008"></p>
+</div>
+</div>
+<p><strong>Зв’язок у генеральній сукупності</strong> <span class="math inline">\(y_i = 2.53 + 0.57 x_i + u_i\)</span></p>
+<p><strong>Зв’язок у вибірці</strong> <span class="math inline">\(\hat{y}_i = 3.21 + 0.45 x_i\)</span></p>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+<p>Давайте повторимо це <strong>10 000 разів</strong>.</p>
+<p>Ця називається моделюванням (Монте-Карло).</p>
+</section>
+<section id="генеральна-скупупність-і-вибірка-5" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+
+<img data-src="02_files/figure-revealjs/simulation-scatter-1.png" width="3000" class="r-stretch"></section>
+<section id="генеральна-скупупність-і-вибірка-6" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="columns">
+<div class="column">
+<div class="cell" data-fig.dpi="300" data-hash="02_cache/revealjs/simulation-scatter-2_e99af3b9a57ae28e7ec887fd23a16404">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/simulation-scatter-2-1.png" width="960"></p>
+</div>
+</div>
+</div><div class="column">
+<ul>
+<li><p>У <strong>середньому</strong> наші лінії регресії дуже добре відповідають лінії генеральної сукупності</p></li>
+<li><p>Однак <strong>окремі лінії</strong> (зразки) дійсно можуть промахнутися.</p></li>
+<li><p>Відмінності між окремими вибірками та генеральною сукупністю призводять до <strong>невизначеності</strong> для економетриста.</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="генеральна-скупупність-і-вибірка-7" class="slide level2">
+<h2>Генеральна скупупність і вибірка</h2>
+<p><strong>Питання:</strong> Чому ми співставляємо <em>генеральну сукупність і вибірку</em>?</p>
+<div class="fragment">
+<p><strong>Відповідь:</strong> Невизначеність має значення.</p>
+<p><span class="math inline">\(\hat{\beta}\)</span> сама по собі є випадковою змінною, яка залежить від випадкової вибірки. Коли ми беремо зразок і запускаємо регресію, ми не знаємо, чи це «хороший» зразок (<span class="math inline">\(\hat{\beta}\)</span> близький до <span class="math inline">\(\beta\)</span>) чи «поганий зразок» (наш зразок сильно відрізняється від генеральної сукупності).</p>
+</div>
+</section>
+<section id="невизначеність" class="slide level2">
+<h2>Невизначеність</h2>
+<p>Відстеження цієї невизначеності буде ключовим поняттям у нашому курсі.</p>
+<ul>
+<li><p>Оцінка стандартних помилок для наших оцінок.</p></li>
+<li><p>Перевірка гіпотез.</p></li>
+<li><p>Поправка на гетероскедастичність і автокореляцію.</p></li>
+</ul>
+<div class="fragment">
+<p>По-перше, давайте оновимо інформацію про те, як ми отримуємо ці (невизначені) оцінки регресії.</p>
+</div>
+</section>
+<section id="оцінювання-параметрів" class="slide level2">
+<h2>Оцінювання параметрів</h2>
+<p>Ми можемо оцінити лінію регресії в R (<code>lm(y ~ x, my_data)</code>). Але звідки такі оцінки?</p>
+<p>Кілька слайдів назад:</p>
+<blockquote>
+<p><span class="math display">\[ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i \]</span> що дає нам <em>найкращий</em> рядок через наш набір даних.</p>
+</blockquote>
+<p>Але що ми маємо на увазі під «найкращою лінією»?</p>
+</section>
+<section id="бути-найкращим" class="slide level2 smaller">
+<h2>Бути «найкращим»</h2>
+<p><strong>Питання:</strong> Що ми маємо на увазі під <em>найкращою лінією</em>?</p>
+<p><strong>Відповіді:</strong></p>
+<ul>
+<li>Загалом (у економетриці), <em>найкраща лінія</em> означає лінію, яка мінімізує суму квадратичних помилок (ESS):</li>
+</ul>
+<p><span class="math display">\[\text{ESS} = \sum_{i = 1}^{n} e_i^2\quad\]</span>,</p>
+<p>де <span class="math inline">\(\quad e_i = y_i - \hat{y}_i\)</span></p>
+<ul>
+<li>Звичайний метод <strong>найменших квадратів</strong> (<strong>OLS</strong>) мінімізує суму квадратів помилок.</li>
+<li>На основі низки (здебільшого прийнятних) припущень, OLS
+<ul>
+<li>Є незміщенним (і послідовним)</li>
+<li>Це <em>найкращий</em> (мінімальна дисперсія) лінійний незміщений оцінювач</li>
+</ul></li>
+</ul>
+</section>
+<section id="мнк-та-інші" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Давайте розглянемо набір даних, який ми згенерували раніше.</p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-1-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-1" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Для будь-якої лінії <span class="math inline">\(\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)\)</span></p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-2-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-2" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Для будь-якої лінії <span class="math inline">\(\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)\)</span> ми можемо обчислити помилки: <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span></p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-3-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-3" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Для будь-якої лінії <span class="math inline">\(\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)\)</span> ми можемо обчислити помилки: <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span></p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-4-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-4" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Для будь-якої лінії <span class="math inline">\(\left(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x\right)\)</span> ми можемо обчислити помилки: <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span></p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-5-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-5" class="slide level2">
+<h2>МНК та інші</h2>
+<p>ESS зводить помилки в квадрат <span class="math inline">\(\left(\sum e_i^2\right)\)</span>: більші помилки отримують більші штрафи.</p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-6-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-та-інші-6" class="slide level2">
+<h2>МНК та інші</h2>
+<p>Оцінка МНК — це комбінація <span class="math inline">\(\hat{\beta}_0\)</span> і <span class="math inline">\(\hat{\beta}_1\)</span>, які мінімізують ESS.</p>
+
+<img data-src="02_files/figure-revealjs/ols-vs-lines-7-1.png" width="960" class="r-stretch"></section>
+<section id="мнк" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально">Формально</h3>
+<p>У простій лінійній регресії оцінювач МНК виходить із вибору <span class="math inline">\(\hat{\beta}_0\)</span> і <span class="math inline">\(\hat{\beta}_1\)</span>, які мінімізують суму квадратів помилок (ESS), <em>тобто</em>,</p>
+<p><span class="math display">\[ \min_{\hat{\beta}_0,\, \hat{\beta}_1} \text{ESS} \]</span></p>
+<div class="fragment">
+<p>але ми вже знаємо <span class="math inline">\(\text{ESS} = \sum_i e_i^2\)</span>. Тепер скористайтеся визначеннями <span class="math inline">\(e_i\)</span> і <span class="math inline">\(\hat{y}\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+   e_i^2 &amp;= \left( y_i - \hat{y}_i \right)^2 = \left( y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i \right)^2 \\
+   &amp;= y_i^2 - 2 y_i \hat{\beta}_0 - 2 y_i \hat{\beta}_1 x_i + \hat{\beta}_0^2 + 2 \hat{\beta}_0 \hat{\beta }_1 x_i + \hat{\beta}_1^2 x_i^2
+\end{aligned}
+\]</span></p>
+</div>
+<div class="fragment">
+<p><strong>Нагадуємо:</strong> мінімізація багатовимірної функції вимагає (<strong>1</strong>) перших похідних, що дорівнюють нулю (<em>1<span class="super">а</span>-умова</em>) та (<strong>2</strong>) умов другого порядку (увігнутість).</p>
+</div>
+</section>
+<section id="мнк-1" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально-1">Формально</h3>
+<p>Ми наближаємось. Нам потрібно <strong>мінімізувати ESS</strong>. Ми показали, як ESS пов’язано з нашою вибіркою (наші дані: <span class="math inline">\(x\)</span> і <span class="math inline">\(y\)</span>) і нашими оцінками (<em>тобто</em>, <span class="math inline">\(\hat{\beta}_0\)</span> і $_1 $).</p>
+<p><span class="math display">\[ \text{ESS} = \sum_i e_i^2 = \sum_i \left( y_i^2 - 2 y_i \hat{\beta}_0 - 2 y_i \hat{\beta}_1 x_i + \hat{\beta} _0^2 + 2 \hat{\beta}_0 \hat{\beta}_1 x_i + \hat{\beta}_1^2 x_i^2 \right) \]</span></p>
+<p>Для умов мінімізації першого порядку ми тепер беремо перші похідні ESS відносно <span class="math inline">\(\hat{\beta}_0\)</span> і <span class="math inline">\(\hat{\beta}_1\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+   \dfrac{\partial \text{ESS}}{\partial \hat{\beta}_0} &amp;= \sum_i \left( 2 \hat{\beta}_0 + 2 \hat{\beta}_1 x_i - 2 y_i \right) = 2n \hat{\beta}_0 + 2 \hat{\beta}_1 \sum_i x_i - 2 \sum_i y_i \\
+   &amp;= 2n \hat{\beta}_0 + 2n \hat{\beta}_1 \overline{x} - 2n \overline{y}
+\end{aligned}
+\]</span></p>
+<p>де <span class="math inline">\(\overline{x} = \frac{\sum x_i}{n}\)</span> і <span class="math inline">\(\overline{y} = \frac{\sum y_i}{n}\)</span> є вибірковими середніми <span class="math inline">\(x\)</span> і <span class="math inline">\(y\)</span> ( розмір <span class="math inline">\(n\)</span>).</p>
+</section>
+<section id="мнк-2" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально-2">Формально</h3>
+<p>Умови першого порядку стверджують, що похідні дорівнюють нулю, отже:</p>
+<p><span class="math display">\[ \dfrac{\partial \text{ESS}}{\partial \hat{\beta}_0} = 2n \hat{\beta}_0 + 2n \hat{\beta}_1 \overline{x} - 2n \overline{y} = 0 \]</span></p>
+<p>що означає</p>
+<p><span class="math display">\[ \hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x} \]</span></p>
+<p>Тепер про <span class="math inline">\(\hat{\beta}_1\)</span>…</p>
+</section>
+<section id="мнк-3" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально-3">Формально</h3>
+<p>Візьміть похідну ESS відносно <span class="math inline">\(\hat{\beta}_1\)</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+   \dfrac{\partial \text{ESS}}{\partial \hat{\beta}_1} &amp;= \sum_i \left( 2 \hat{\beta}_0 x_i + 2 \hat{\beta}_1 x_i^2 - 2 y_i x_i \right) = 2 \hat{\beta}_0 \sum_i x_i + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i \\
+   &amp;= 2n \hat{\beta}_0 \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i
+\end{aligned}
+\]</span></p>
+<p>встановити його рівним нулю (знову умови першого порядку)</p>
+<p><span class="math display">\[ \dfrac{\partial \text{ESS}}{\partial \hat{\beta}_1} = 2n \hat{\beta}_0 \overline{x} + 2 \hat{\beta}_1 \sum_i x_i ^2 - 2 \sum_i y_i x_i = 0 \]</span></p>
+<p>і замініть у нашому відношенні <span class="math inline">\(\hat{\beta}_0\)</span>, <em>тобто</em>, <span class="math inline">\(\hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x}\)</span> . Таким чином,</p>
+<p><span class="math display">\[
+  2n \left(\overline{y} - \hat{\beta}_1 \overline{x}\right) \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0
+\]</span></p>
+</section>
+<section id="мнк-4" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально-4">Формально</h3>
+<p>Продовжуючи з останнього слайда</p>
+<p><span class="math display">\[ 2n \left(\overline{y} - \hat{\beta}_1 \overline{x}\right) \overline{x} + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0 \]</span></p>
+<p>розкриваємо дужки</p>
+<p><span class="math display">\[ 2n \overline{y}\,\overline{x} - 2n \hat{\beta}_1 \overline{x}^2 + 2 \hat{\beta}_1 \sum_i x_i^2 - 2 \sum_i y_i x_i = 0 \]</span></p>
+<p><span class="math display">\[ \implies 2 \hat{\beta}_1 \left( \sum_i x_i^2 - n \overline{x}^2 \right) = 2 \sum_i y_i x_i - 2n \overline{y}\,\overline{ x} \]</span></p>
+<p><span class="math display">\[ \implies \hat{\beta}_1 = \dfrac{\sum_i y_i x_i - 2n \overline{y}\,\overline{x}}{\sum_i x_i^2 - n \overline{x}^2} = \dfrac{\sum_i (x_i - \overline{x})(y_i - \overline{y})}{\sum_i (x_i - \overline{x})^2} \]</span></p>
+</section>
+<section id="мнк-5" class="slide level2">
+<h2>МНК</h2>
+<h3 id="формально-5">Формально</h3>
+<p>Готово!</p>
+<p>Тепер у нас є оцінювачі МНК для нахилу</p>
+<p><span class="math display">\[ \hat{\beta}_1 = \dfrac{\sum_i (x_i - \overline{x})(y_i - \overline{y})}{\sum_i (x_i - \overline{x})^2}\]</span></p>
+<p>і перетину</p>
+<p><span class="math display">\[ \hat{\beta}_0 = \overline{y} - \hat{\beta}_1 \overline{x} \]</span></p>
+<div class="fragment">
+<p>Тепер ми повернемося до припущень і (неявних) властивостей OLS.</p>
+</div>
+</section></section>
+<section>
+<section id="мнк-припущення-та-властивості" class="title-slide slide level1 center">
+<h1>МНК: припущення та властивості</h1>
+
+</section>
+<section id="мнк-припущення-та-властивості-1" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості">Властивості</h3>
+<p><strong>Питання:</strong> Які властивості можуть бути важливі для оцінювача?</p>
+<div class="fragment">
+<p><strong>Дотична:</strong> Давайте спочатку розглянемо статистичні властивості.</p>
+</div>
+</section>
+<section id="мнк-припущення-та-властивості-2" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-1">Властивості</h3>
+<p><strong>Згадуємо:</strong> Функції щільності</p>
+<p>Пам’ятайте, що ми використовуємо <strong>функції щільності ймовірності</strong> (PDF) для опису ймовірності того, що <strong>неперервна випадкова змінна</strong> приймає діапазон значень. (Площа = 1.)</p>
+<p>Ці PDF-и характеризують розподіли ймовірностей, а найпоширеніші/відомі/популярні розподіли мають назви (<em>наприклад</em>, нормальний, <em>t</em>, Гамма).</p>
+</section>
+<section id="мнк-припущення-та-властивості-3" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-2">Властивості</h3>
+<p><strong>Згадуємо:</strong> Функції щільності</p>
+<p>Імовірність того, що стандартна нормальна випадкова змінна набуває значення від -2 до 0: <span class="math inline">\(\mathop{\text{P}}\left(-2 \leq X \leq 0\right) = 0,48\)</span></p>
+
+<img data-src="02_files/figure-revealjs/example-pdf-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-4" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-3">Властивості</h3>
+<p>Імовірність того, що стандартна нормальна випадкова змінна набуває значення від -1,96 до 1,96: <span class="math inline">\(\mathop{\text{P}}\left(-1,96 \leq X \leq 1,96\right) = 0,95\)</span></p>
+
+<img data-src="02_files/figure-revealjs/example-pdf-2-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-5" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-4">Властивості</h3>
+<p>Імовірність того, що стандартна нормальна випадкова змінна набуває значення більше 2: <span class="math inline">\(\mathop{\text{P}}\left(X &gt; 2\right) = 0,023\)</span></p>
+
+<img data-src="02_files/figure-revealjs/example-pdf-3-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-6" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<p>Уявіть, що ми намагаємося оцінити невідомий параметр <span class="math inline">\(\beta\)</span>, і нам відомі розподіли трьох конкуруючих оцінювачів. Який би ми обрали? Як би ми обирали?</p>
+
+<img data-src="02_files/figure-revealjs/competing-pdfs-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-7" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-5">Властивості</h3>
+<p><strong>Питання:</strong> Які властивості можуть бути важливі для оцінювача?</p>
+<div class="fragment">
+<p><strong>Відповідь перша: зміщення (Bias)</strong></p>
+<p>Чи в середньому (після <em>багатьох</em> вибірок) оцінювач наближається до правильного значення?</p>
+<p><strong>Більш формально: </strong> Чи дорівнює середнє значення розподілу оцінювача параметру, який він оцінює?</p>
+<p><span class="math display">\[ \mathop{\text{Bias}}_\beta \left( \hat{\beta} \right) = \mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] - \beta \]</span></p>
+</div>
+</section>
+<section id="мнк-припущення-та-властивості-8" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-6">Властивості</h3>
+<p><strong>Відповідь перша: зміщення (Bias)</strong></p>
+<div class="columns">
+<div class="column">
+<p><strong>Незміщенна оцінка:</strong> <span class="math inline">\(\mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] = \beta\)</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/unbiased-pdf-1.png" width="960"></p>
+</div>
+</div>
+</div><div class="column">
+<p><strong>Зміщенна оцінка:</strong> <span class="math inline">\(\mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] \neq \beta\)</span></p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="02_files/figure-revealjs/biased-pdf-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="мнк-припущення-та-властивості-9" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-7">Властивості</h3>
+<p><strong>Відповідь друга: відхилення/дисперсія (Variance).</strong></p>
+<div class="fragment">
+<p>Важливі не лише центральні тенденції конкуруючих розподілів. Ми також дбаємо про <strong>дисперсію</strong> оцінювача.</p>
+<p><span class="math display">\[ \mathop{\text{Var}} \left( \hat{\beta} \right) = \mathop{\boldsymbol{E}}\left[ \left( \hat{\beta} - \mathop{\boldsymbol{E}}\left[ \hat{\beta} \right] \right)^2 \right] \]</span></p>
+<p>Менші оцінки дисперсії означають, що ми отримуємо оцінки ближче до середнього в кожній вибірці.</p>
+</div>
+</section>
+<section id="мнк-припущення-та-властивості-10" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-8">Властивості</h3>
+<p><strong>Відповідь друга: відхилення/дисперсія (Variance).</strong></p>
+
+<img data-src="02_files/figure-revealjs/variance-pdf-1.png" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-11" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-9">Властивості</h3>
+<p><strong>Відповідь перша: зміщення</strong></p>
+<p><strong>Відповідь друга: відхилення.</strong></p>
+<p><strong>Тонкощі:</strong> Компроміс зміщення-дисперсії (<em>bias-variance tradeoff</em>).</p>
+<p>Чи повинні ми бути готові прийняти трохи упередження, щоб зменшити дисперсію?</p>
+<p>В економетриці ми зазвичай дотримуємося неупереджених (або послідовних) оцінок. Але інші дисципліни (особливо у сфері ML) більше думають про цей компроміс.</p>
+</section>
+<section id="the-bias-variance-tradeoff." class="slide level2">
+<h2>The bias-variance tradeoff.</h2>
+
+<img data-src="02_files/figure-revealjs/variance-bias-1.svg" width="960" class="r-stretch"></section>
+<section id="мнк-припущення-та-властивості-12" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-10">Властивості</h3>
+<p>Як ви вже могли здогадатися,</p>
+<ul>
+<li>МНК є <strong>незміщеною оцінкою</strong>.</li>
+<li>МНК має <strong>мінімальне відхилення</strong> серед усіх незміщених лінійних оцінок.</li>
+</ul>
+</section>
+<section id="мнк-припущення-та-властивості-13" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="властивості-11">Властивості</h3>
+<p>Але… ці (дуже гарні) властивості залежать від ряду припущень:</p>
+<ol type="1">
+<li><p>Зв’язок генеральної сукупності є лінійним.</p></li>
+<li><p>Наша змінна <span class="math inline">\(X\)</span> є <strong>екзогенною</strong>, <em>тобто</em>, <span class="math inline">\(\mathop{\boldsymbol{E}}\left[ u \mid X \right] = 0\)</span>.</p></li>
+<li><p>Змінна <span class="math inline">\(X\)</span> має варіацію. І якщо існує кілька пояснювальних змінних, вони не є абсолютно колінеарними.</p></li>
+<li><p>Збурення генеральної сукупності <span class="math inline">\(u_i\)</span> незалежно та однаково розподілені за нормальним законом розподілу із середнім в нулі <span class="math inline">\(\left( \mathop{\boldsymbol{E}}\left[ u \right] = 0 \right)\)</span> та дисперсією <span class="math inline">\(\sigma^2\)</span> (<em>тобто</em>, <span class="math inline">\(\mathop{\boldsymbol{E}}\left[ u^2 \right] = \sigma^2\)</span>).</p></li>
+</ol>
+</section>
+<section id="мнк-припущення-та-властивості-14" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="припущення">Припущення</h3>
+<p>Різні припущення гарантують різні властивості:</p>
+<ul>
+<li><p>Припущення (1), (2) і (3) роблять OLS незміщеним.</p></li>
+<li><p>Припущення (4) дає нам незміщену оцінку для дисперсії наших оцінок МНК.</p></li>
+</ul>
+<p>Під час нашого курсу ми обговоримо багато способів, як реальне життя може <strong>порушити ці припущення</strong>. Наприклад:</p>
+<ul>
+<li><p>Нелінійні залежності в наших параметрах (або неправильна специфікація).</p></li>
+<li><p>Порушення, які не однаково розподілені та/або незалежні.</p></li>
+<li><p>Порушення екзогенності (особливо зміщення пропущеної змінної).</p></li>
+</ul>
+</section>
+<section id="мнк-припущення-та-властивості-15" class="slide level2">
+<h2>МНК: припущення та властивості</h2>
+<h3 id="умовне-сподівання">Умовне сподівання</h3>
+<p>Для багатьох випадків, нашим найважливішим припущенням є <strong>екзогенність</strong>, <em>тобто</em>, <span class="math display">\[
+\begin{align}
+   \mathop{E}\left[ u \mid X \right] = 0
+\end{align}
+\]</span> але що це насправді означає?</p>
+<div class="fragment">
+<p>Один із способів подумати про це визначення:</p>
+<blockquote>
+<p>Для <em>будь-якого</em> значення <span class="math inline">\(X\)</span> середнє значення залишків має дорівнювати нулю.</p>
+</blockquote>
+<ul>
+<li><p><em>Наприклад</em>, <span class="math inline">\(\mathop{E}\left[ u \mid X=1 \right]=0\)</span> <em>і</em> <span class="math inline">\(\mathop{E}\left[ u \mid X=100 \right]= 0\)</span></p></li>
+<li><p><em>Наприклад</em>, <span class="math inline">\(\mathop{E}\left[ u \mid X_2=\text{Жінка} \right]=0\)</span> <em>і</em> <span class="math inline">\(\mathop{E}\left[ u \mid X_2=\ text{Чоловік} \right]=0\)</span></p></li>
+</ul>
+</div>
+</section>
+<section class="slide level2">
+
+<p>Графічно…</p>
+</section>
+<section class="slide level2">
+
+<p>Дійсна екзогенність, <em>тобто</em>, <span class="math inline">\(\mathop{E}\left[ u \mid X \right] = 0\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>cond_good</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="02_files/figure-revealjs/ex-good-exog-1.png" width="960" class="r-stretch"></section>
+<section class="slide level2">
+
+<p>Недійсна екзогенність, <em>i.e.</em>, <span class="math inline">\(\mathop{E}\left[ u \mid X \right] \neq 0\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>cond_bad</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="02_files/figure-revealjs/ex-bad-exog-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="невизначеність-і-вивід" class="title-slide slide level1 center">
+<h1>Невизначеність і вивід</h1>
+
+</section>
+<section id="невизначеність-і-вивід-1" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="щось-ще">Щось ще?</h3>
+<p>До цього моменту ми знаємо, що МНК має деякі хороші властивості, і ми знаємо, як оцінити перетин і коефіцієнт нахилу за допомогою МНК.</p>
+<p>Наш поточний робочий процес: - Отримати дані (точки зі значеннями <span class="math inline">\(x\)</span> і <span class="math inline">\(y\)</span>)</p>
+<ul>
+<li><p>Побудувати модель <span class="math inline">\(y\)</span> на <span class="math inline">\(x\)</span></p></li>
+<li><p>Побудуйте лінію МНК (<em>тобто</em>, <span class="math inline">\(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1\)</span>)</p></li>
+<li><p>Готово?</p></li>
+</ul>
+<p>Але як ми насправді чогось <strong>навчимося</strong> з цієї вправи?</p>
+</section>
+<section id="невизначеність-і-вивід-2" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="щось-ще-так">Щось ще? Так!</h3>
+<p>Але як ми насправді чогось <strong>навчимося</strong> з цієї вправи?</p>
+<ul>
+<li><p>Наскільки ми повинні бути впевнені в точності наших оцінок?</p></li>
+<li><p>Наскільки добре наша модель пояснює зміну <span class="math inline">\(y\)</span>?</p></li>
+</ul>
+<p>Ми повинні вміти справлятися з невизначеністю. Введіть: <strong>Висновок.</strong></p>
+</section>
+<section id="невизначеність-і-вивід-3" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках">Вчимося на помилках</h3>
+<p>Як показало наше попереднє моделювання, наша проблема з <strong>невизначеністю</strong> полягає в тому, що ми не знаємо, чи наша вибіркова оцінка <em>близька</em> чи <em>далека</em> від невідомого параметра генеральної сукупності.</p>
+<p>Проте ще не все втрачено. Ми можемо використовувати помилки <span class="math inline">\(\left(e_i = y_i - \hat{y}_i\right)\)</span>, щоб зрозуміти, наскільки добре наша модель пояснює варіацію <span class="math inline">\(y\)</span>.</p>
+<p>Коли здається, що наша модель виконує «гарну» роботу, ми можемо з більшою впевненістю використовувати її, щоб дізнатися про зв’язок між <span class="math inline">\(y\)</span> і <span class="math inline">\(x\)</span>.</p>
+<p>Тепер нам просто потрібно формалізувати вищезазначене.</p>
+</section>
+<section id="невизначеність-і-вивід-4" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках-1">Вчимося на помилках</h3>
+<p>Спочатку ми оцінимо дисперсію <span class="math inline">\(u_i\)</span> (нагадаємо: <span class="math inline">\(\mathop{\text{Var}} \left( u_i \right) = \sigma^2\)</span>), використовуючи наші квадрати помилок, <em>тобто</em>,</p>
+<p><span class="math display">\[ s^2 = \dfrac{\sum_i e_i^2}{n - k} \]</span></p>
+<p>де <span class="math inline">\(k\)</span> дає кількість параметрів моделі, яку ми оцінюємо (<em>наприклад</em>, <span class="math inline">\(\beta_0\)</span> і <span class="math inline">\(\beta_1\)</span> дадуть <span class="math inline">\(k=2\)</span>).</p>
+<p><span class="math inline">\(s^2\)</span> є незміщеною оцінкою <span class="math inline">\(\sigma^2\)</span>.</p>
+</section>
+<section id="невизначеність-і-вивід-5" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках-2">Вчимося на помилках</h3>
+<p>Дисперсія <span class="math inline">\(\hat{\beta}_1\)</span> (для простої лінійної регресії) дорівнює</p>
+<p><span class="math display">\[ \mathop{\text{Var}} \left( \hat{\beta}_1 \right) = \dfrac{s^2}{\sum_i \left( x_i - \overline{x} \right)^2 } \]</span></p>
+<p>який показує, що дисперсія нашого оцінювача нахилу</p>
+<ol type="1">
+<li><p>збільшується, оскільки наші збурення стають шумнішими</p></li>
+<li><p>зменшується зі збільшенням дисперсії <span class="math inline">\(x\)</span></p></li>
+</ol>
+</section>
+<section id="невизначеність-і-вивід-6" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках-3">Вчимося на помилках</h3>
+<p><em>Найчастіше:</em> <strong>стандартна помилка</strong> <span class="math inline">\(\hat{\beta}_1\)</span></p>
+<p><span class="math display">\[ \mathop{\hat{\text{SE}}} \left( \hat{\beta}_1 \right) = \sqrt{\dfrac{s^2}{\sum_i \left( x_i - \overline{ x} \right)^2}} \]</span></p>
+<p><em>Нагадуємо:</em> Стандартна помилка оцінювача — це стандартне відхилення розподілу оцінювача.</p>
+</section>
+<section id="невизначеність-і-вивід-7" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках-4">Вчимося на помилках</h3>
+<p>Вивід помилок з <code>lm()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x, pop_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+2 x              0.567    0.0793      7.15 1.59e-10</code></pre>
+</div>
+</div>
+</section>
+<section id="невизначеність-і-вивід-8" class="slide level2">
+<h2>Невизначеність і вивід</h2>
+<h3 id="вчимося-на-помилках-5">Вчимося на помилках</h3>
+<p>Ми використовуємо стандартну помилку <span class="math inline">\(\hat{\beta}_1\)</span> разом із самим <span class="math inline">\(\hat{\beta}_1\)</span>, щоб дізнатися про параметр <span class="math inline">\(\beta_1\)</span>.</p>
+<p>Після отримання розподілу <span class="math inline">\(\hat{\beta}_1\)</span>, у нас є два (пов’язаних) варіанти формального статистичного висновку (навчання) щодо нашого невідомого параметра <span class="math inline">\(\beta_1\)</span>:</p>
+<ul>
+<li><p><strong>Довірчі інтервали:</strong> Використовуйте оцінку та її стандартну помилку, щоб створити інтервал, який при повторенні зазвичай міститиме справжній параметр.</p></li>
+<li><p><strong>Перевірка гіпотези:</strong> Визначте, чи є статистично значущі докази відхилення гіпотетичного значення або діапазону значень.</p></li>
+</ul>
+</section></section>
+<section>
+<section id="довірчі-інтервали" class="title-slide slide level1 center">
+<h1>Довірчі інтервали</h1>
+
+</section>
+<section id="довірчі-інтервали-1" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p>Будуємо довірчі інтервали рівня <span class="math inline">\((1-\alpha)\)</span> для <span class="math inline">\(\beta_1\)</span> <span class="math display">\[ \hat{\beta_1}\ \pm t_{\alpha/2,\text{df}} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta_1} \right) \]</span> <span class="math inline">\(t_{\alpha/2,\text{df}}\)</span> позначає <span class="math inline">\(\alpha/2\)</span> квантиль <span class="math inline">\(t\)</span> розподілу з <span class="math inline">\(n-k\)</span> ступенями свободи.</p>
+</section>
+<section id="довірчі-інтервали-2" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p>Будуємо довірчі інтервали рівня <span class="math inline">\((1-\alpha)\)</span> для <span class="math inline">\(\beta_1\)</span> <span class="math display">\[ \hat{\beta_1}\ \pm t_{\alpha/2,\text{df}} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta_1} \right) \]</span> Наприклад, 100 спостережень, два коефіцієнти (<em>тобто</em>, <span class="math inline">\(\hat{\beta}_0\)</span> і <span class="math inline">\(\hat{\beta}_1 \implies k = 2\)</span>), і <span class="math inline">\(\alpha = 0,05\)</span> ( для 95% довірчого інтервалу) дає нам <span class="math inline">\(t_{0,025,\,98} = -1.98\)</span></p>
+
+<img data-src="02_files/figure-revealjs/t-dist-1.png" width="960" class="r-stretch"></section>
+<section id="довірчі-інтервали-3" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p>Будуємо довірчі інтервали рівня <span class="math inline">\((1-\alpha)\)</span> для <span class="math inline">\(\beta_1\)</span> <span class="math display">\[ \hat{\beta_1}\ \pm t_{\alpha/2,\text{df}} \, \mathop{\hat{\text{SE}}} \left( \hat{\beta_1} \right) \]</span></p>
+<p><strong>Приклад:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" data-code-line-numbers="3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> pop_df) <span class="sc">%&gt;%</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+2 x              0.567    0.0793      7.15 1.59e-10</code></pre>
+</div>
+</div>
+<div class="fragment">
+<p>Отже, наш 95% довірчий інтервал становить <span class="math inline">\(0,567 \pm 1,98 \times 0,0793 = \left[ 0,410,\, 0,724 \right]\)</span></p>
+</div>
+</section>
+<section id="довірчі-інтервали-4" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p>Отже, ми маємо довірчий інтервал для <span class="math inline">\(\beta_1\)</span>, <em>тобто</em>, <span class="math inline">\(\left[ 0,410,\, 0,724 \right]\)</span>.</p>
+<p>Що це означає?</p>
+<div class="fragment">
+<p><strong>Неофіційно:</strong> Довірчий інтервал дає нам область (інтервал), в якій ми можемо певною мірою довіряти щодо вмісту параметра.</p>
+</div>
+<div class="fragment">
+<p><strong>Більш формально:</strong> Якщо неодноразово робити вибірку з нашої сукупності та будувати довірчі інтервали для кожної з цих вибірок, <span class="math inline">\((1-\alpha)\)</span> відсотків наших інтервалів (<em>наприклад</em>, 95%) міститиме параметр генеральної сукупності <em>десь в інтервалі</em>.</p>
+</div>
+<div class="fragment">
+<p>Тепер повернемося до нашої симуляції…</p>
+</div>
+</section>
+<section id="довірчі-інтервали-5" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p>Ми відібрали 10 000 вибірок (кожна розміром <span class="math inline">\(n = 30\)</span>) із нашої сукупності та оцінили нашу регресійну модель для кожної з цих симуляцій:</p>
+<span class="math display">\[ y_i = \hat{\beta}_0 + \hat{\beta}_1 x_i + e_i \]</span>
+<center>
+(повторюється 10 000 разів)
+</center>
+<p>Тепер давайте оцінимо 95% довірчі інтервали для кожного з цих інтервалів…</p>
+</section>
+<section id="довірчі-інтервали-6" class="slide level2">
+<h2>Довірчі інтервали</h2>
+<p><strong>З нашого попереднього моделювання:</strong> 97.9% 95% довірчих інтервалів містять справжнє значення параметра <span class="math inline">\(\beta_1\)</span>.</p>
+
+<img data-src="02_files/figure-revealjs/simulation-ci-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="тестування-гіпотез" class="title-slide slide level1 center">
+<h1>Тестування гіпотез</h1>
+
+</section>
+<section id="тестування-гіпотез-1" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<p>У багатьох дослідженнях ми хочемо знати більше, ніж точкову оцінку або діапазон значень. Ми хочемо знати, що наші статистичні дані говорять про існуючі теорії.</p>
+<p>Ми хочемо перевірити гіпотези, висунуті чиновниками, політиками, економістами, науковцями, друзями, дивними сусідами тощо.</p>
+<p><strong>Приклади</strong></p>
+<ul>
+<li><p>Збільшення присутності поліції <strong>зменшує злочинність</strong>?</p></li>
+<li><p>Будівництво гігантської стіни <strong>зменшує злочинність</strong>?</p></li>
+<li><p>Розпуск уряду <strong>згубно впливає на економіку</strong>?</p></li>
+<li><p>Чи легальний канабіс <strong>зменшує водіння в нетверезому стані</strong> або <strong>зменшує вживання опіоїдів</strong>?</p></li>
+<li><p>Чи стандарти якості повітря <strong>покращують здоров’я</strong> та/або <strong>зменшують кількість робочіх місць</strong>?</p></li>
+</ul>
+</section>
+<section id="тестування-гіпотез-2" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<p>Перевірка гіпотез спирається на дуже схожі результати та інтуїцію.</p>
+<p>Хоча невизначеність, звичайно, існує, ми все ще можемо побудувати <em>надійні</em> статистичні тести (відкидаючи або не відхиляючи висунуту гіпотезу).</p>
+<div class="fragment">
+<p><strong>МНК <em>t</em> тест</strong>: Наша (нульова) гіпотеза стверджує, що <span class="math inline">\(\beta_1\)</span> дорівнює значенню <span class="math inline">\(c\)</span>, <em>тобто</em>, <span class="math inline">\(H_o:\: \beta_1 = c\)</span></p>
+<p>З властивостей МНК ми можемо показати, що тестова статистика</p>
+<p><span class="math display">\[ t_\text{stat} = \dfrac{\hat{\beta}_1 - c}{\mathop{\hat{\text{SE}}} \left( \hat{\beta}_1 \right)} \]</span></p>
+<p>слідує розподілу <span class="math inline">\(t\)</span> з <span class="math inline">\(n-k\)</span> ступенями свободи.</p>
+</div>
+</section>
+<section id="тестування-гіпотез-3" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<p>Для <strong>двостороннього</strong> тесту рівня <span class="math inline">\(\alpha\)</span> ми відхиляємо нульову гіпотезу (і завершуємо альтернативну гіпотезу), коли</p>
+<p><span class="math display">\[ \left|t_\text{stat}\right| &gt; \left|t_{1-\alpha/2,\,df}\right| \]</span></p>
+<p>це означає, що наша <strong>тестова статистика є більш екстремальною, ніж критичне значення</strong>.</p>
+<p>Крім того, ми можемо обчислити <strong>p-значення</strong>, яке супроводжує нашу тестову статистику, що фактично дає нам імовірність побачити нашу тестову статистику <em>або більш екстремальну тестову статистику</em>, якщо нульова гіпотеза вірна.</p>
+<p>Дуже малі p-значення (зазвичай &lt; 0,05) означають, що ми навряд чи побачимо наші результати, якби нульова гіпотеза дійсно була вірною — ми схильні відхиляти нуьлову гіпотезу для p-значень нижче 0,05.</p>
+</section>
+<section id="тестування-гіпотез-4" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" data-code-line-numbers="5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> pop_df) <span class="sc">%&gt;%</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)    2.53     0.422       6.00 3.38e- 8
+2 x              0.567    0.0793      7.15 1.59e-10</code></pre>
+</div>
+</div>
+<div class="fragment">
+<p><span class="math inline">\(H_0\)</span>: <span class="math inline">\(\beta_1 = 0\)</span> <em>vs.</em> <span class="math inline">\(H_a\)</span>: <span class="math inline">\(\beta_1 \neq 0\)</span></p>
+</div>
+<div class="fragment">
+<p><span class="math inline">\(t_\text{stat} = 7.15\)</span> та <span class="math inline">\(t_\text{0.975, 28} = 2.05\)</span></p>
+</div>
+<div class="fragment">
+<p><em>p</em>-значення <span class="math inline">\(&lt; 0,05\)</span></p>
+<p><strong>Тому ми відкидаємо <span class="math inline">\(H_0\)</span>!</strong></p>
+</div>
+</section>
+<section id="тестування-гіпотез-5" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<p>Повертаємося до нашої симуляції! Давайте подивимося, що насправді робить наша <span class="math inline">\(t\)</span> статистика.</p>
+<p>У цій ситуації ми фактично можемо знати (і забезпечити) нульову гіпотезу, оскільки ми згенерували дані.</p>
+<p>Для кожного з 10 000 зразків ми обчислимо статистику <span class="math inline">\(t\)</span>, а потім побачимо, скільки статистичних даних <span class="math inline">\(t\)</span> перевищує наше критичне значення (2.05, як вище).</p>
+<p>Відповідь має бути приблизно 5 відсотків — наш рівень <span class="math inline">\(\alpha\)</span>.</p>
+</section>
+<section id="тестування-гіпотез-6" class="slide level2">
+<h2>Тестування гіпотез</h2>
+<p>У нашому моделюванні 2.1 відсотока нашої статистики <span class="math inline">\(t\)</span> відхиляє нульову гіпотезу.</p>
+<p>Розподіл нашої статистики <span class="math inline">\(t\)</span> (заштрихування областей відхилення).</p>
+
+<img data-src="02_files/figure-revealjs/simulation-t-plot-1.png" width="960" class="r-stretch"></section>
+<section class="slide level2">
+
+<p>Відповідно, 2.1 відсоток наших значень p відхиляє нульову гіпотезу.</p>
+<p>Розподіл наших значень p (заштрихування значень p нижче 0,05).</p>
+
+<img data-src="02_files/figure-revealjs/simulation-p-plot-1.png" width="960" class="r-stretch"></section>
+<section id="f-тест" class="slide level2">
+<h2><em>F</em> тест</h2>
+<p>Іноді в економетриці можна зустріти тести <span class="math inline">\(F\)</span>.</p>
+<p>Ми використовуємо тести <span class="math inline">\(F\)</span> для перевірки гіпотез, які включають кілька параметрів <br> (<em>наприклад</em>, <span class="math inline">\(\beta_1 = \beta_2\)</span> або <span class="math inline">\(\beta_3 + \beta_4 = 1\)</span>),</p>
+<p>а не одна проста гіпотеза <br>(<em>наприклад</em>, <span class="math inline">\(\beta_1 = 0\)</span>, для якого ми просто використаємо тест <span class="math inline">\(t\)</span>).</p>
+</section>
+<section id="f-тест-1" class="slide level2">
+<h2><em>F</em> тест</h2>
+<p><strong>Приклад</strong></p>
+<p>Економісти люблять казати: «Гроші взаємозамінні».</p>
+<p>Уявіть собі, що ми можемо захотіти перевірити, чи дійсно гроші, отримані як дохід, мають такий же вплив на споживання, як гроші, отримані від податкових знижок.</p>
+<p><span class="math display">\[ \text{Споживання}_i = \beta_0 + \beta_1 \text{Дохід}_{i} + \beta_2 \text{Знижка}_i + u_i \]</span></p>
+</section>
+<section id="f-тест-2" class="slide level2">
+<h2><em>F</em> тест</h2>
+<p><strong>Приклад, продовження</strong></p>
+<p>Ми можемо записати нашу нульову гіпотезу як</p>
+<p><span class="math display">\[ H_o:\: \beta_1 = \beta_2 \iff H_o :\: \beta_1 - \beta_2 = 0 \]</span></p>
+<p>Накладення цієї нульової гіпотези дає нам <strong>обмежену модель</strong></p>
+<p><span class="math display">\[ \text{Споживання}_i = \beta_0 + \beta_1 \text{Дохід}_{i} + \beta_1 \text{Знижка}_i + u_i \]</span> <span class="math display">\[ \text{Споживання}_i = \beta_0 + \beta_1 \left( \text{Дохід}_{i} + \text{Знижка}_i \right) + u_i \]</span></p>
+</section>
+<section id="f-тест-3" class="slide level2">
+<h2><em>F</em> тест</h2>
+<p><strong>Приклад, продовження</strong></p>
+<p>Щоб перевірити нульову гіпотезу <span class="math inline">\(H_o :\: \beta_1 = \beta_2\)</span> проти <span class="math inline">\(H_a :\: \beta_1 \neq \beta_2\)</span>, <br>ми використовуємо статистику <span class="math inline">\(F\)</span> <span class="math display">\[
+\begin{align}
+   F_{q,\,n-k-1} = \dfrac{\left(\text{ESS}_r - \text{ESS}_u\right)/q}{\text{ESS}_u/(n-k-1)}
+\end{align}
+\]</span> який (як випливає з назви) відповідає розподілу <span class="math inline">\(F\)</span> із ступенями свободи в чисельнику <span class="math inline">\(q\)</span> і ступенями свободи в знаменнику <span class="math inline">\(n-k-1\)</span>.</p>
+<p>Тут <span class="math inline">\(q\)</span> — це кількість обмежень, які ми накладаємо через <span class="math inline">\(H_o\)</span>.</p>
+</section>
+<section id="f-тест-4" class="slide level2">
+<h2><em>F</em> тест</h2>
+<p><strong>Приклад, продовження</strong></p>
+<p><span class="math inline">\(\text{ESS}_r\)</span> – це сума квадратів помилок (ESS) з нашої <strong>обмеженої моделі</strong> <span class="math display">\[ \text{Споживання}_i = \beta_0 + \beta_1 \left( \text{Дохід}_{i} + \text{Знижка}_i \right) + u_i \]</span></p>
+<p>а <span class="math inline">\(\text{ESS}_u\)</span> – це сума квадратів помилок (ESS) з нашої <strong>необмеженої моделі</strong> <span class="math display">\[ \text{Споживання}_i = \beta_0 + \beta_1 \text{Дохід}_{i} + \beta_2 \text{Знижка}_i + u_i \]</span></p>
+<div class="fragment">
+<p>Тест <span class="math inline">\(F\)</span> порівнює ефективність необмеженої моделі з ефективність обмеженої моделі, використовуючи їхні <span class="math inline">\(\text{ESS}\)</span>.</p>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+\begin{align}
+   F_\text{stat} = \dfrac{\left(\text{ESS}_r - \text{ESS}_u\right)/q}{\text{ESS}_u/(n-k-1)} \sim F_{ q,\,n-k-1}
+\end{align}
+\]</span></p>
+</div>
+</section></section>
+<section id="дякую-за-увагу" class="title-slide slide level1 unnumbered unlisted center">
+<h1>Дякую за увагу!</h1>
+
+<img src="img/logo.png" class="slide-logo r-stretch"><div class="footer footer-default">
+
+</div>
+</section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="02_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="02_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="02_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="02_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="02_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="02_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="02_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="02_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="02_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: true,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        target: function(trigger) {
+          return trigger.previousElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto-reveal',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
